@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест бойынша білімді тексеру</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        danger: '#FF4D4F',
+                        warning: '#FAAD14',
+                        light: '#F7F8FA',
+                        dark: '#1D2129'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .option-item {
+                @apply border border-gray-200 rounded-lg p-4 mb-3 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-blue-50;
+            }
+            .option-item.selected {
+                @apply border-primary bg-blue-100;
+            }
+            .btn-primary {
+                @apply bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Главная страница -->
+        <div id="homePage" class="block">
+            <div class="text-center mb-12">
+                <h1 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark mb-4">Білімді тексеру тесті</h1>
+                <p class="text-gray-500 max-w-2xl mx-auto">Веб-әзірлеу, JavaScript, CSS, HTML және PHP саласындағы білімдеріңізді тексеріңіз. Қажетті режимді таңдаңыз.</p>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-1 lg:grid-cols-1 max-w-2xl mx-auto">
+                <button onclick="startTest('all')" class="card text-left flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xl">
+                        <i class="fa fa-list-ol"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">Барлық сұрақтарға жауап беру</h3>
+                        <p class="text-gray-500 text-sm">Барлық 150 сұрақтан тұратын толық тест</p>
+                    </div>
+                </button>
+
+                <button onclick="showPartSelection()" class="card text-left flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 text-secondary flex items-center justify-center text-xl">
+                        <i class="fa fa-th-large"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">Бөліктер бойынша жауап беру</h3>
+                        <p class="text-gray-500 text-sm">Қажетті бөлікті таңдап, сол бөлімнің сұрақтарына жауап беріңіз</p>
+                    </div>
+                </button>
+
+                <button onclick="startTest('random')" class="card text-left flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 rounded-full bg-warning/10 text-warning flex items-center justify-center text-xl">
+                        <i class="fa fa-random"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">Кездейсоқ сұрақтарға жауап беру</h3>
+                        <p class="text-gray-500 text-sm">Барлық сұрақтардан кездейсоқ таңдалған 50 сұрақтан тұратын тест</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Выбор части -->
+        <div id="partSelectionPage" class="hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,2.5vw,2rem)] font-bold text-dark mb-4">Бөлікті таңдаңыз</h2>
+                <p class="text-gray-500">Қай бөлімнің сұрақтарына жауап бергіңіз келеді?</p>
+            </div>
+
+            <div class="grid gap-4 max-w-md mx-auto">
+                <button onclick="startTest('part1')" class="card text-center py-4 hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-semibold text-dark">1-бөлім</h3>
+                    <p class="text-gray-500 text-sm">1-40 сұрақтар</p>
+                </button>
+                <button onclick="startTest('part2')" class="card text-center py-4 hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-semibold text-dark">2-бөлім</h3>
+                    <p class="text-gray-500 text-sm">41-80 сұрақтар</p>
+                </button>
+                <button onclick="startTest('part3')" class="card text-center py-4 hover:shadow-md transition-shadow">
+                    <h3 class="text-lg font-semibold text-dark">3-бөлім</h3>
+                    <p class="text-gray-500 text-sm">81-150 сұрақтар</p>
+                </button>
+                <button onclick="goBack()" class="mt-4 text-gray-500 hover:text-dark flex items-center justify-center gap-2">
+                    <i class="fa fa-arrow-left"></i> Басты бетке оралу
+                </button>
+            </div>
+        </div>
+
+        <!-- Страница теста -->
+        <div id="testPage" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 id="testTitle" class="text-[clamp(1.3rem,2vw,1.8rem)] font-bold text-dark"></h2>
+                <div class="text-gray-500">
+                    Сұрақ: <span id="questionCount">0 / 0</span>
+                </div>
+            </div>
+
+            <div id="questionsContainer">
+                <!-- Сұрақтар осында шығады -->
+            </div>
+
+            <div class="mt-8 flex justify-between">
+                <button onclick="goBack()" class="text-gray-500 hover:text-dark flex items-center gap-2">
+                    <i class="fa fa-arrow-left"></i> Басты бетке оралу
+                </button>
+                <button onclick="finishTest()" class="btn-primary">Тесті аяқтау</button>
+            </div>
+        </div>
+
+        <!-- Страница результатов -->
+        <div id="resultPage" class="hidden container mx-auto px-4 py-8 max-w-2xl">
+        <div class="card text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6">
+                <i class="fa fa-trophy text-4xl text-primary"></i>
+            </div>
+            <h1 class="text-3xl font-bold mb-2">Тест аяқталды!</h1>
+            <p class="text-gray-500 mb-8">Сіздің нәтижеңіз:</p>
+            
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <p class="text-sm text-gray-500 mb-1">Барлығы</p>
+                    <p id="totalQuestions" class="text-2xl font-bold text-dark">0</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-xl">
+                    <p class="text-sm text-green-600 mb-1">Дұрыс</p>
+                    <p id="correctAnswers" class="text-2xl font-bold text-green-600">0</p>
+                </div>
+                <div class="p-4 bg-blue-50 rounded-xl">
+                    <p class="text-sm text-blue-600 mb-1">Пайыз</p>
+                    <p id="resultPercent" class="text-2xl font-bold text-blue-600">0%</p>
+                </div>
+            </div>
+
+            <div id="wrongAnswersBlock" class="hidden text-left mb-8">
+                <h3 class="text-xl font-bold mb-4 text-danger">Қатемен жұмыс:</h3>
+                <div id="wrongAnswersList" class="space-y-4">
+                    </div>
+            </div>
+
+            <button onclick="goBack()" class="btn-primary w-full py-4 rounded-xl font-bold shadow-lg shadow-primary/30">
+                Басты бетке қайту
+            </button>
+        </div>
+    </div>
+
+            <div id="wrongAnswersContainer" class="mb-8">
+                <!-- Қате жауаптар туралы ақпарат осында шығады -->
+            </div>
+
+            <div class="text-center">
+                <button onclick="goBack()" class="btn-primary">Қайтадан бастау</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Барлық сұрақтар және дұрыс жауаптар
+        const testData = [
+            // 1-бөлім
+            {
+                id: 1,
+                part: 1,
+                question: "window объектісінің _______ әдісі хабарламасы бар және бір батырмасы бар қарапайым терезені көрсету үшін қолданылады.",
+                options: ["A) prompt()", "B) splice()", "C) confirm()", "D) shift()", "E) alert()"],
+                correct: "E"
+            },
+            {
+                id: 2,
+                part: 1,
+                question: "____________ әдісі енгізу өрісі, хабарлама және OK мен Cancel батырмалары бар диалогтық терезені көрсетеді.",
+                options: ["A) prompt()", "B) splice()", "C) confirm()", "D) shift()", "E) alert()"],
+                correct: "A"
+            },
+            {
+                id: 3,
+                part: 1,
+                question: "____________ операторы айнымалының деректер типін сипаттайтын жолды қайтарады.",
+                options: ["A) unshift()", "B) typeof", "C) pop()", "D) some()", "E) push()"],
+                correct: "B"
+            },
+            {
+                id: 4,
+                part: 1,
+                question: "Мүмкін болған жағдайда жолды бүтін санға түрлендіретін функция:",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "A"
+            },
+            {
+                id: 5,
+                part: 1,
+                question: "Мүмкін болған жағдайда жолды қалқымалы үтірлі санға түрлендіретін функция:",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "B"
+            },
+            {
+                id: 6,
+                part: 1,
+                question: "Жолдағы өрнекті кәдімгі JavaScript өрнегі сияқты есептейтін функция:",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "C"
+            },
+            {
+                id: 7,
+                part: 1,
+                question: "Массивтегі элементтер санын анықтау үшін қолданылатын қасиет:",
+                options: ["A) Boolean", "B) Object", "C) concat()", "D) length", "E) push()"],
+                correct: "D"
+            },
+            {
+                id: 8,
+                part: 1,
+                question: "else блогы жоқ шартты оператор түрі:",
+                options: ["A) шарт", "B) жеңілдетілген форма", "C) ғаламдық айнымалы", "D) өрнек", "E) массив"],
+                correct: "B"
+            },
+            {
+                id: 9,
+                part: 1,
+                question: "Массивтен элементті іздеуге арналған әдіс, бірақ бұл жағдайда іздеу массивтің соңынан басталады.",
+                options: ["A) reverse()", "B) lastIndexOf()", "C) push()", "D) forEach()", "E) indexOf()"],
+                correct: "B"
+            },
+            {
+                id: 10,
+                part: 1,
+                question: "Массивтің әрбір элементі үшін берілген функцияны шақыратын әдіс:",
+                options: ["A) concat()", "B) reverse()", "C) forEach()", "D) every()", "E) indexOf()"],
+                correct: "C"
+            },
+            {
+                id: 11,
+                part: 1,
+                question: "Бірнеше массивті біріктіру арқылы жаңа массив жасайтын әдіс:",
+                options: ["A) concat()", "B) reverse()", "C) reduce()", "D) push()", "E) sort()"],
+                correct: "A"
+            },
+            {
+                id: 12,
+                part: 1,
+                question: "Массивтің соңына элемент қосуға арналған әдіс:",
+                options: ["A) splice()", "B) join()", "C) reduce()", "D) push()", "E) sort()"],
+                correct: "D"
+            },
+            {
+                id: 13,
+                part: 1,
+                question: "Массивтің бірінші элементін жоятын әдіс:",
+                options: ["A) unshift()", "B) shift()", "C) pop()", "D) push()", "E) sort()"],
+                correct: "B"
+            },
+            {
+                id: 14,
+                part: 1,
+                question: "Бинарлық «НЕМЕСЕ» (OR) операциясы, егер операндтардың бірі true болса, ақиқат болады.",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "A"
+            },
+            {
+                id: 15,
+                part: 1,
+                question: "Унарлық терістеу (NOT) операциясы:",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "C"
+            },
+            {
+                id: 16,
+                part: 1,
+                question: "Массивтен элемент іздеуге арналған әдіс:",
+                options: ["A) reduce()", "B) lastIndexOf()", "C) join()", "D) concat()", "E) indexOf()"],
+                correct: "E"
+            },
+                        {
+                id: 17,
+                part: 1,
+                question: "__________________ - айнымалылар, тұрақтылар және операторлар жиынтығы.",
+                options: ["A) reduce()", "B) өрнек", "C) жеңілдетілген форма", "D) unshift()", "E) шарт"],
+                correct: "B"
+            },
+            {
+                id: 18,
+                part: 1,
+                question: "Ағымдағы итерацияны тоқтатып, келесі қадамға өтеді.",
+                options: ["A) continue", "B) lastIndexOf()", "C) break", "D) parseInt", "E) indexOf()"],
+                correct: "A"
+            },
+            {
+                id: 19,
+                part: 1,
+                question: "______________________ — екі индексі бар, әрқайсысы жеке квадрат жақшада жазылады.",
+                options: ["A) біржолды комментарий", "B) көпжолды комментарий", "C) екі өлшемді массив", "D) бір өлшемді массив", "E) шарт"],
+                correct: "C"
+            },
+            {
+                id: 20,
+                part: 1,
+                question: "Бинарлық «ЖӘНЕ» (AND) операциясы, егер екі операнд та true болса, ақиқат болады.",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "B"
+            },
+            {
+                id: 21,
+                part: 1,
+                question: "Массивтің бір бөлігін жойып, оның орнына жаңа элементтерді кірістіруге арналған әдіс:",
+                options: ["A) join()", "B) reverse()", "C) reduce()", "D) slice()", "E) splice()"],
+                correct: "E"
+            },
+            {
+                id: 22,
+                part: 1,
+                question: "Массив негізінде бір мәнді есептеуге арналған және элементтерді біртіндеп өңдейтін әдіс:",
+                options: ["A) reduceRight()", "B) reverse()", "C) lastIndexOf()", "D) splice()", "E) reverse()"],
+                correct: "A"
+            },
+            {
+                id: 23,
+                part: 1,
+                question: "Әр элементке берілген функцияны қолдану арқылы жаңа массив құратын әдіс:",
+                options: ["A) some()", "B) filter()", "C) map()", "D) splice()", "E) pop()"],
+                correct: "C"
+            },
+            {
+                id: 24,
+                part: 1,
+                question: "if шартты операторы дегеніміз не?",
+                options: ["A) жолдағы өрнекті JavaScript сияқты есептейді", "B) шарттың ақиқат немесе жалған болуына қарай әртүрлі командалар блогын орындайды", "C) функция ішінде жарияланған айнымалы", "D) if, switch", "E) массив элементіне мән беру"],
+                correct: "B"
+            },
+            {
+                id: 25,
+                part: 1,
+                question: "Салыстыру операторлары негізінде құрылған логикалық өрнек дегеніміз не?",
+                options: ["A) alert әдісі", "B) шарт", "C) айнымалы", "D) ғаламдық айнымалы", "E) санау циклі"],
+                correct: "B"
+            },
+            {
+                id: 26,
+                part: 1,
+                question: "Массивті бір ортақ мәнге келтіруге арналған әдіс қандай?",
+                options: ["A) concat()", "B) reverse()", "C) reduce()", "D) slice()", "E) splice()"],
+                correct: "C"
+            },
+            {
+                id: 27,
+                part: 1,
+                question: "Егер массив элементтерінің кем дегенде біреуі берілген шартқа сай келсе, true мәнін қайтарады, ал әйтпесе false қайтарады.",
+                options: ["A) some()", "B) sort()", "C) reduce()", "D) slice()", "E) forEach()"],
+                correct: "A"
+            },
+            {
+                id: 28,
+                part: 1,
+                question: "JavaScript-та айнымалыны қандай қызметтік сөздер арқылы жариялауға болады.",
+                options: ["A) var, let", "B) int", "C) char", "D) Var", "E) $ int"],
+                correct: "A"
+            },
+            {
+                id: 29,
+                part: 1,
+                question: "Логикалық деректер типі, тек екі мән қабылдайды: true (ақиқат) және false (жалған).",
+                options: ["A) int", "B) char", "C) for", "D) float", "E) boolean"],
+                correct: "E"
+            },
+            {
+                id: 30,
+                part: 1,
+                question: "Массив элементтерін кері ретпен қайта сұрыптайтын әдіс:",
+                options: ["A) join()", "B) sort()", "C) reduce()", "D) reverse()", "E) reduceRight()"],
+                correct: "D"
+            },
+            {
+                id: 31,
+                part: 1,
+                question: "Массив элементтері негізінде мәтіндік жол құратын әдіс:",
+                options: ["A) join()", "B) indexOf()", "C) reduce()", "D) lastIndexOf()", "E) push()"],
+                correct: "A"
+            },
+            {
+                id: 32,
+                part: 1,
+                question: "Селектор анықтамасы __________________?",
+                options: ["A) HTML элементінің атауы немесе HTML элементтер комбинациясы, оларға форматтау ережесі беріледі", "B) анықтама “{” жақшасымен басталып “}” жақшасымен аяқталады", "C) өңдеуге рұқсат беретін атрибут", "D) drag and drop әрекеттерін анықтайтын атрибут", "E) құжат құрылымын беру"],
+                correct: "A"
+            },
+            {
+                id: 33,
+                part: 1,
+                question: "Блоктың анықтамасы ___________________________?",
+                options: ["A) HTML элементінің атауы немесе HTML элементтерінің комбинациясы, оларға форматтау ережесі беріледі", "B) анықтама “{“ сол жақ фигуралы жақшамен басталып, “}” оң жақ фигуралы жақшамен аяқталады", "C) өңдеуге рұқсат беруді көрсететін атрибут", "D) drag and drop әрекеттерін анықтайтын атрибут", "E) құжат құрылымын беру, физикалық форматтау элементтерін қолдану"],
+                correct: "B"
+            },
+            {
+                id: 34,
+                part: 1,
+                question: "CSS енгізу (импорт) әдісі _______________________?",
+                options: ["A) стильдер кестесі сыртқы файлда орналасып, HTML құжатына link арқылы қосылады", "B) сыртқы файлдағы стильдер @import арқылы HTML ішіне енгізіледі", "C) стильдер HTML құжаттың head бөлімінде style тегінде жазылады", "D) әр тегке style атрибуты арқылы жеке стиль беріледі", "E) drag and drop атрибуты"],
+                correct: "B"
+            },
+            {
+                id: 35,
+                part: 1,
+                question: "margin-left дегеніміз не?",
+                options: ["A) сол жақ шекара", "B) сол жақ өріс (поле)", "C) сол жақ шегініс", "D) оң жақ шегініс", "E) оң жақ шекара"],
+                correct: "C"
+            },
+            {
+                id: 36,
+                part: 1,
+                question: "border-right дегеніміз не?",
+                options: ["A) сол жақ шекара", "B) сол жақ өріс", "C) сол жақ шегініс", "D) оң жақ шегініс", "E) оң жақ шекара"],
+                correct: "E"
+            },
+            {
+                id: 37,
+                part: 1,
+                question: "padding-left дегеніміз не?",
+                options: ["A) сол жақ шекара", "B) сол жақ өріс", "C) сол жақ шегініс", "D) оң жақ шегініс", "E) оң жақ шекара"],
+                correct: "B"
+            },
+            {
+                id: 38,
+                part: 1,
+                question: "padding-top дегеніміз не?",
+                options: ["A) жоғарғы шегініс мөлшері", "B) оң жақ шегініс мөлшері", "C) төменгі шегініс мөлшері", "D) сол жақ шегініс мөлшері", "E) оң жақ шегініс"],
+                correct: "A"
+            },
+            {
+                id: 39,
+                part: 1,
+                question: "width қасиеті ______________________________________.",
+                options: ["A) элементтің енін орнатады", "B) элементтің жоғарғы шетінің орнын ата-аналық элементке қатысты анықтайды", "C) элементтің ішкі сол жақ шегінісін орнатады", "D) сол жақ шекараның түсін, түрін және қалыңдығын орнатады", "E) элементтің төменгі шетінің орнын анықтайды"],
+                correct: "A"
+            },
+            {
+                id: 40,
+                part: 1,
+                question: "Төменгі шекараның ені қалай беріледі ________________?",
+                options: ["A) border-top-width:", "B) border-bottom-width:", "C) border-right-width:", "D) border-left-width:", "E) border-top-color:"],
+                correct: "B"
+            },
+            {
+                id: 41,
+                part: 1,
+                question: "Төменгі шекараның түсі қалай анықталады ________________________?",
+                options: ["A) border-top-color:", "B) border-bottom-color:", "C) border-right-color:", "D) border-left-color:", "E) border-bottom-width:"],
+                correct: "B"
+            },
+            {
+                id: 42,
+                part: 1,
+                question: "Төрт шекараның түсін бір уақытта көрсетуге арналған қасиет _______________?",
+                options: ["A) border-color", "B) border-bottom-color:", "C) border-right-color:", "D) border-left-color:", "E) border-bottom-width:"],
+                correct: "A"
+            },
+            {
+                id: 43,
+                part: 1,
+                question: "Линия түрі _________ — бұл мәнді қолданғанда блок дөңес (көтеріңкі) болып көрінеді.",
+                options: ["A) dotted", "B) groove", "C) ridge", "D) inset", "E) outset"],
+                correct: "E"
+            },
+            {
+                id: 44,
+                part: 1,
+                question: "Линия түрі __________________ — шекара дөңес сызық түрінде көрінеді.",
+                options: ["A) dotted", "B) groove", "C) ridge", "D) inset", "E) outset"],
+                correct: "C"
+            },
+            {
+                id: 45,
+                part: 1,
+                question: "___________________ қасиеті фондық суреттің құжатпен бірге жылжитынын немесе жылжымайтынын анықтайды.",
+                options: ["A) background-repeat:", "B) background-attachment:", "C) background-position:", "D) background-origin", "E) background-size"],
+                correct: "B"
+            },
+            {
+                id: 46,
+                part: 1,
+                question: "_____________________ қасиеті фондық суреттің вертикаль және горизонталь бағытта қайталануын анықтайды.",
+                options: ["A) background-repeat:", "B) background-attachment:", "C) background-position:", "D) background-origin", "E) background-size"],
+                correct: "A"
+            },
+            {
+                id: 47,
+                part: 1,
+                question: "_____________________ көмегімен мәтінді астын сызу, үстінен сызу немесе сызып тастау (зачеркнуть) жасауға болады.",
+                options: ["A) text-decoration", "B) text-indent", "C) text-align", "D) text-decoration", "E) line-through"],
+                correct: "A"
+            },
+            {
+                id: 48,
+                part: 1,
+                question: "________________ көмегімен абзацтың бірінші жолындағы бірінші сөздің шегінісін беруге болады.",
+                options: ["A) text-decoration", "B) text-indent", "C) text-align", "D) text-decoration", "E) line-through"],
+                correct: "B"
+            },
+            {
+                id: 49,
+                part: 1,
+                question: "____________ қасиеті мәтінді стилдік блоктың ішіндегі туралауды анықтайды.",
+                options: ["A) text-decoration", "B) text-indent", "C) text-align", "D) text-decoration", "E) line-through"],
+                correct: "C"
+            },
+            {
+                id: 50,
+                part: 1,
+                question: "text-decoration қасиетінің ____________ мәні берілсе, мәтіннің әр жолы астынан сызылады.",
+                options: ["A) underline", "B) overline", "C) line-through", "D) none", "E) text-indent"],
+                correct: "A"
+            },
+                        // 2-бөлім
+            {
+                id: 51,
+                part: 2,
+                question: "__________________ CSS қасиеті әріптер арасындағы қашықтықты орнатады.",
+                options: ["A) letter-spacing", "B) letterspacing.normal", "C) wordspacing", "D) lineheight", "E) text-decoration"],
+                correct: "A"
+            },
+            {
+                id: 52,
+                part: 2,
+                question: "___________________ қасиеті мәтіндегі әріптердің регистрін (үлкен/кіші) түрлендіреді.",
+                options: ["A) text-transform", "B) text-decoration", "C) text-indent", "D) text-align", "E) text-decoration"],
+                correct: "A"
+            },
+            {
+                id: 53,
+                part: 2,
+                question: "___________________ қасиеті мәтіндегі сызықтың орналасуын анықтайды.",
+                options: ["A) text-decoration-line", "B) text-decoration-style", "C) text-decoration-color", "D) text-transform", "E) text-decoration"],
+                correct: "A"
+            },
+            {
+                id: 54,
+                part: 2,
+                question: "_________________________ қасиеті анимацияның орындалу уақытын орнатады.",
+                options: ["A) animation-duration", "B) animation-name", "C) animation-delay", "D) animation-timing-function", "E) animation-iteration-count"],
+                correct: "A"
+            },
+            {
+                id: 55,
+                part: 2,
+                question: "________________________ қасиеті анимация аяқталғаннан кейін оның қандай күйде қалатынын анықтайды.",
+                options: ["A) animation-duration", "B) animation-name", "C) animation-delay", "D) animation-timing-function", "E) animation-fill-mode"],
+                correct: "E"
+            },
+            {
+                id: 56,
+                part: 2,
+                question: "_______________ қасиеті — анимацияға арналған қысқаша (сокращённая) қасиет, барлық параметрлерді бірден орнатуға мүмкіндік береді.",
+                options: ["A) animation-duration", "B) animation-name", "C) animation", "D) animation-timing-function", "E) animation-fill-mode"],
+                correct: "C"
+            },
+            {
+                id: 57,
+                part: 2,
+                question: "________________ қасиеті элементтің трансформациялары қай нүктеге қатысты орындалатынын анықтайды.",
+                options: ["A) transform-origin", "B) transform", "C) rotate()", "D) rotateX", "E) rotateY"],
+                correct: "A"
+            },
+            {
+                id: 58,
+                part: 2,
+                question: "_________________ қасиеті элементтің тышқан оқиғаларына реакциясын өшіруге мүмкіндік береді.",
+                options: ["A) pointer-events", "B) user-select", "C) selection", "D) opacity", "E) hue-rotate"],
+                correct: "A"
+            },
+            {
+                id: 59,
+                part: 2,
+                question: "ul тізімінде нүктелердің орнына квадрат немесе шеңбер, ал ol тізімінде рим сандары немесе әріптер қолдануға мүмкіндік беретін қасиет.",
+                options: ["A) list-style-type", "B) caret-color", "C) list-style-image", "D) list-style", "E) lineheight"],
+                correct: "A"
+            },
+            {
+                id: 60,
+                part: 2,
+                question: "list-style-type, list-style-image және list-style-position қасиеттерін бір уақытта орнатуға мүмкіндік беретін қасиет.",
+                options: ["A) list-style-type", "B) caret-color", "C) list-style-image", "D) list-style", "E) lineheight"],
+                correct: "D"
+            },
+            {
+                id: 61,
+                part: 2,
+                question: "Құжаттың басқа жерінде қайта қолдануға болатын, өз алдына бөлек бөлікті сипаттайтын элемент.",
+                options: ["A) article", "B) profile", "C) section", "D) aside", "E) style"],
+                correct: "A"
+            },
+            {
+                id: 62,
+                part: 2,
+                question: "Кестедегі жолдар саны қандай тегтердің санына байланысты анықталады.",
+                options: ["A) UL", "B) TR", "C) TD", "D) THEAD", "E) TH"],
+                correct: "B"
+            },
+            {
+                id: 63,
+                part: 2,
+                question: "Кестедегі негізгі мазмұндық жолдар тобын білдіретін тег.",
+                options: ["A) Тег TBODY", "B) TR", "C) TD", "D) THEAD", "E) TH"],
+                correct: "A"
+            },
+            {
+                id: 64,
+                part: 2,
+                question: "Элементті жасыруға мүмкіндік беретін логикалық атрибут.",
+                options: ["A) contenteditable", "B) hidden", "C) tabindex", "D) draggable", "E) style"],
+                correct: "B"
+            },
+            {
+                id: 65,
+                part: 2,
+                question: "Пайдаланушыға тег ішіндегі мазмұнды өңдеуге рұқсат беруді анықтайтын атрибут.",
+                options: ["A) contenteditable", "B) hidden", "C) tabindex", "D) draggable", "E) translate"],
+                correct: "A"
+            },
+            {
+                id: 66,
+                part: 2,
+                question: "= \"символ\" — пернетақтадағы пернені тағайындауға мүмкіндік беретін атрибут, басқанда тегті іске қосады немесе ерекшелейді.",
+                options: ["A) dropzone", "B) accesskey", "C) profile", "D) tabindex", "E) hidden"],
+                correct: "B"
+            },
+            {
+                id: 67,
+                part: 2,
+                question: "Беттің автономды (өздігінен бөлек) бөлімін білдіретін элемент.",
+                options: ["A) section", "B) hidden", "C) COLGROUP", "D) article", "E) profile"],
+                correct: "D"
+            },
+            {
+                id: 68,
+                part: 2,
+                question: "Жолды мәжбүрлі түрде жаңа жолға ауыстыратын элемент.",
+                options: ["A) nav тегі", "B) P тегі", "C) BR тегі", "D) abbr тегі", "E) section тегі"],
+                correct: "C"
+            },
+            {
+                id: 69,
+                part: 2,
+                question: "Кестедегі бағандардың (жолдар тобының) төменгі бөлігін (аяғын) білдіретін тег.",
+                options: ["A) FOOTER тегі", "B) TBODY тегі", "C) THEAD тегі", "D) TFOOT тегі", "E) COLGROUP тегі"],
+                correct: "D"
+            },
+            {
+                id: 70,
+                part: 2,
+                question: "Элементке қолданылатын CSS стильдерін сипаттайтын қасиет.",
+                options: ["A) draggable атрибуты", "B) translate атрибуты", "C) style атрибуты", "D) hidden атрибуты", "E) profile атрибуты"],
+                correct: "C"
+            },
+            {
+                id: 71,
+                part: 2,
+                question: "HTML абзацтарға бөлуді жүзеге асыратын тег қандай?",
+                options: ["A) P тегі", "B) NAV тегі", "C) BODY тегі", "D) BR тегі", "E) THEAD тегі"],
+                correct: "A"
+            },
+            {
+                id: 72,
+                part: 2,
+                question: "HTML құжаты жылжытылған жағдайда да салыстырмалы сілтемелерді дұрыс жұмыс істеуін қамтамасыз ететін тег.",
+                options: ["A) HREF тегі", "B) BODY тегі", "C) NAV тегі", "D) BASE тегі", "E) LINK тегі"],
+                correct: "D"
+            },
+            {
+                id: 73,
+                part: 2,
+                question: "title атрибутымен бірге қолданылып, аббревиатураның толық мағынасын көрсететін тег.",
+                options: ["A) abbr тегі", "B) acronym тегі", "C) accesskey атрибуты", "D) dfn тегі", "E) dropzone атрибуты"],
+                correct: "A"
+            },
+            {
+                id: 74,
+                part: 2,
+                question: "Бетті автоматты аудару кезінде тег ішіндегі мазмұнның аударылатынын немесе аударылмайтынын анықтайтын атрибут.",
+                options: ["A) dropzone атрибуты", "B) translate атрибуты", "C) accesskey атрибуты", "D) profile атрибуты", "E) FOOTER тегі"],
+                correct: "B"
+            },
+            {
+                id: 75,
+                part: 2,
+                question: "Мәтінді ерекшелеу (акцент беру) үшін қолданылатын тег.",
+                options: ["A) FOOTER тегі", "B) TD тегі", "C) em тегі", "D) p тегі", "E) CAPTION тегі"],
+                correct: "C"
+            },
+            {
+                id: 76,
+                part: 2,
+                question: "__________ — орындалу кезінде интерпретацияланатын бағдарламалық нұсқаулар жиынтығы.",
+                options: ["A) Скрипт", "B) PHP", "C) Бағдарламалау тілінің лексикалық құрылымы", "D) Оператор", "E) Массив"],
+                correct: "A"
+            },
+            {
+                id: 77,
+                part: 2,
+                question: "Айнымалы атаулары әрқашан қай таңбадан басталуы керек?",
+                options: ["A) php", "B) ?php ... ?", "C) script", "D) code", "E) $"],
+                correct: "E"
+            },
+            {
+                id: 78,
+                part: 2,
+                question: "Константаларды анықтау үшін қандай функция қолданылады?",
+                options: ["A) define()", "B) combine()", "C) concatenate()", "D) merge()", "E) const"],
+                correct: "A"
+            },
+            {
+                id: 79,
+                part: 2,
+                question: "__________ командасы жолдар мен сандарды шығарады, сонымен қатар олардың типін және өлшемін көрсетеді.",
+                options: ["A) Int", "B) Var", "C) Echo", "D) $ int", "E) var_dump"],
+                correct: "E"
+            },
+            {
+                id: 80,
+                part: 2,
+                question: "Функция ішінде ғаламдық айнымалыға қол жеткізу үшін қандай кілт сөз қолданылады?",
+                options: ["A) global", "B) counter", "C) now", "D) time", "E) date"],
+                correct: "A"
+            },
+            {
+                id: 81,
+                part: 2,
+                question: "Статикалық айнымалыны жариялау үшін қандай кілт сөз қолданылады?",
+                options: ["A) Static", "B) Function", "C) Echo", "D) var_dump", "E) global"],
+                correct: "A"
+            },
+            {
+                id: 82,
+                part: 2,
+                question: "Сценарийдің орындалуын дереу тоқтату үшін қандай оператор қолданылады?",
+                options: ["A) exit", "B) return", "C) check()", "D) isset()", "E) break"],
+                correct: "A"
+            },
+            {
+                id: 83,
+                part: 2,
+                question: "PHP-де массивті қалай жариялауға болады?",
+                options: ["A) array{}", "B) array()", "C) []", "D) {}", "E) rray()"],
+                correct: "B"
+            },
+            {
+                id: 84,
+                part: 2,
+                question: "Айнымалының анықталғанын қалай тексеруге болады?",
+                options: ["A) check()", "B) isset()", "C) is_set()", "D) exists()", "E) defined()"],
+                correct: "B"
+            },
+            {
+                id: 85,
+                part: 2,
+                question: "PHP скриптін аяқтау үшін қандай әдіс қолданылады?",
+                options: ["A) die()", "B) exit()", "C) stop()", "D) end()", "E) halt()"],
+                correct: "B"
+            },
+            {
+                id: 86,
+                part: 2,
+                question: "Скрипт (сценарий) дегеніміз не?",
+                options: ["A) орындалу кезінде интерпретацияланатын бағдарламалық нұсқаулар жиынтығы", "B) орындалу кезінде интерпретацияланатын тіл, скрипттер басқа ортаға енгізіледі", "C) серверде орындалатын скрипттер", "D) веб-сайттар жасауға арналған бағдарламалау тілі", "E) серверлік және клиенттік скрипттер туралы түсінік"],
+                correct: "A"
+            },
+            {
+                id: 87,
+                part: 2,
+                question: "\\n символы нені білдіреді?",
+                options: ["A) табуляция белгісі", "B) байланыс (привязка)", "C) тік табуляция", "D) жаңа жол", "E) жаңа баған"],
+                correct: "D"
+            },
+            {
+                id: 88,
+                part: 2,
+                question: "PHP-де көпжолды комментарийді қалай жазуға болады?",
+                options: ["A) //", "B) *", "C) ##", "D) –", "E) ///"],
+                correct: "B"
+            },
+            {
+                id: 89,
+                part: 2,
+                question: "PHP-де объектіні қалай құруға болады?",
+                options: ["A) new Object()", "B) Object()", "C) new ClassName()", "D) class ClassName {}", "E) ClassName()"],
+                correct: "C"
+            },
+            {
+                id: 90,
+                part: 2,
+                question: "\\t символы нені білдіреді?",
+                options: ["A) табуляция белгісі", "B) байланыс", "C) тік табуляция", "D) жаңа жол", "E) жаңа баған"],
+                correct: "A"
+            },
+                        {
+                id: 91,
+                part: 2,
+                question: "_______________ функциясы екі берілген мәннің арасындағы тізбекті сандар немесе символдар массивін құрады.",
+                options: ["A) range()", "B) new Object()", "C) Object()", "D) new ClassName()", "E) halt()"],
+                correct: "A"
+            },
+            {
+                id: 92,
+                part: 2,
+                question: "Массивтегі элементтер санын қайтаратын функциялар қандай?",
+                options: ["A) new Object()", "B) Object()", "C) new ClassName()", "D) class ClassName {}", "E) count(), sizeof()"],
+                correct: "E"
+            },
+            {
+                id: 93,
+                part: 2,
+                question: "Массивтің барлық элементтерін айнымалыларға көшіру үшін қандай конструкция қолданылады?",
+                options: ["A) range()", "B) count()", "C) sizeof()", "D) list()", "E) copy()"],
+                correct: "D"
+            },
+            {
+                id: 94,
+                part: 2,
+                question: "Массивті бірнеше кіші массивтерге бөлу үшін қандай функция қолданылады?",
+                options: ["A) array_chunk()", "B) array_slice()", "C) array_keys()", "D) array_key_exists()", "E) list()"],
+                correct: "A"
+            },
+            {
+                id: 95,
+                part: 2,
+                question: "_______________ функциясы тек кілттерден тұратын массивті қайтарады.",
+                options: ["A) array_chunk()", "B) array_slice()", "C) array_keys()", "D) array_key_exists()", "E) list()"],
+                correct: "C"
+            },
+            {
+                id: 96,
+                part: 2,
+                question: "_____________________ — өзара байланысты ақпаратты қамтитын өрістер жиынтығы.",
+                options: ["A) Жазба (record)", "B) Кесте (table)", "C) Мән (entity)", "D) Индекс (index)", "E) Көріністер (views)"],
+                correct: "A"
+            },
+            {
+                id: 97,
+                part: 2,
+                question: "_______________ — бір немесе бірнеше кестелерден не көріністерден алынған деректердің біртұтас көрінісін ұсынады.",
+                options: ["A) Жазба (record)", "B) Кесте (table)", "C) Мән (entity)", "D) Индекс (index)", "E) Көріністер (views)"],
+                correct: "E"
+            },
+            {
+                id: 98,
+                part: 2,
+                question: "ДҚ-дағы деректер типтері: MEDIUMTEXT қандай ұзындықтағы мәтінді сақтай алады?",
+                options: ["A) 255 символ", "B) 65535 символ", "C) 65 КБ", "D) 16 МБ", "E) 4 ГБ"],
+                correct: "D"
+            },
+            {
+                id: 99,
+                part: 2,
+                question: "CREATE операторы не істейді?",
+                options: ["A) әртүрлі объектілерді құрады", "B) деректер қорынан ақпарат таңдайды", "C) жазба қосады", "D) жазбаны/жазбаларды жаңартады", "E) жазбаны/жазбаларды жояды"],
+                correct: "A"
+            },
+            {
+                id: 100,
+                part: 2,
+                question: "WHERE параметрі не үшін қолданылады?",
+                options: ["A) таңдалатын жазбаларды анықтайтын шартты көрсету үшін", "B) сұрыптау орындалатын өрісті көрсету үшін", "C) жазбаны өзгерту үшін", "D) әдепкі мәнді орнату үшін", "E) жазбаны жою үшін"],
+                correct: "A"
+            },
+                        // 3-бөлім
+            {
+                id: 101,
+                part: 3,
+                question: "ORDER BY параметрі не үшін қолданылады?",
+                options: ["A) жазбаларды таңдау шартын көрсету үшін", "B) сұрыптау орындалатын өрісті көрсету үшін", "C) жазбаны өзгерту үшін", "D) әдепкі мәнді орнату үшін", "E) жазбаны жою үшін"],
+                correct: "B"
+            },
+            {
+                id: 102,
+                part: 3,
+                question: "DEFAULT мәні нені білдіреді?",
+                options: ["A) таңдау шартын көрсету", "B) сұрыптау өрісін көрсету", "C) өзгерту үшін", "D) кесте құрылғанда берілген әдепкі мәнді орнатады", "E) жою үшін"],
+                correct: "D"
+            },
+            {
+                id: 103,
+                part: 3,
+                question: "Қай тег мәтінді анықтама (definition) ретінде белгілейді?",
+                options: ["A) dfn тегі", "B) cite тегі", "C) em тегі", "D) code тегі", "E) i тегі"],
+                correct: "A"
+            },
+            {
+                id: 104,
+                part: 3,
+                question: "Тегтің мазмұнын сүйреп апаруға болатынын немесе болмайтынын анықтайды.",
+                options: ["A) style атрибуты", "B) draggable атрибуты", "C) translate атрибуты", "D) accesskey атрибуты", "E) tabindex атрибуты"],
+                correct: "B"
+            },
+            {
+                id: 105,
+                part: 3,
+                question: "Мәні 0-ден 32767-ге дейінгі сан болатын, Tab пернесін басу арқылы ауысу ретін анықтайтын атрибут.",
+                options: ["A) translate атрибуты", "B) dropzone атрибуты", "C) hidden атрибуты", "D) tabindex атрибуты", "E) accesskey атрибуты"],
+                correct: "D"
+            },
+            {
+                id: 106,
+                part: 3,
+                question: "Тег мазмұны үшін мәтін бағытын көрсетуге мүмкіндік береді.",
+                options: ["A) href", "B) HEADER", "C) CAPTION", "D) dir", "E) dfn"],
+                correct: "D"
+            },
+            {
+                id: 107,
+                part: 3,
+                question: "UL тегі ………",
+                options: ["A) реттелмеген тізімдер", "B) мәтінді форматтау", "C) реттелген тізімдер", "D) жолдық тег", "E) тізімдік тег"],
+                correct: "A"
+            },
+            {
+                id: 108,
+                part: 3,
+                question: "UL және OL тізімдері қандай тег арқылы элементтерден тұрады?",
+                options: ["A) LI тегі", "B) LINK тегі", "C) TD тегі", "D) b тегі", "E) code тегі"],
+                correct: "A"
+            },
+            {
+                id: 109,
+                part: 3,
+                question: "HEAD тегінің сыртқы мета-файлды көрсететін атрибуты.",
+                options: ["A) profile", "B) accesskey", "C) translate", "D) dropzone", "E) CAPTION"],
+                correct: "A"
+            },
+            {
+                id: 110,
+                part: 3,
+                question: "Кестенің атауын (тақырыбын) анықтайтын тег.",
+                options: ["A) abbr тегі", "B) COLGROUP тегі", "C) META тегі", "D) CAPTION тегі", "E) TD тегі"],
+                correct: "D"
+            },
+            {
+                id: 111,
+                part: 3,
+                question: "Құжат туралы ақпаратты қамтитын төменгі колонтитул.",
+                options: ["A) FOOTER", "B) cite", "C) em", "D) HEADER", "E) NAV"],
+                correct: "A"
+            },
+            {
+                id: 112,
+                part: 3,
+                question: "Кестенің тақырып бөлігін білдіретін жолдар тобын анықтайтын тег.",
+                options: ["A) THEAD тегі", "B) HEADER тегі", "C) TBODY тегі", "D) TFOOT тегі", "E) CAPTION тегі"],
+                correct: "A"
+            },
+            {
+                id: 113,
+                part: 3,
+                question: "HTML құжатының тақырып бөлігін анықтайтын тег.",
+                options: ["A) THEAD тегі", "B) HEADER тегі", "C) TBODY тегі", "D) TFOOT тегі", "E) CAPTION тегі"],
+                correct: "B"
+            },
+            {
+                id: 114,
+                part: 3,
+                question: "Браузерге HTML стандарты қолданылғанын көрсететін тег.",
+                options: ["A) draggable атрибуты", "B) accesskey атрибуты", "C) !DOCTYPE html", "D) HEAD", "E) BODY"],
+                correct: "C"
+            },
+            {
+                id: 115,
+                part: 3,
+                question: "Құжат туралы ақпаратты қамтуға арналған тег.",
+                options: ["A) HEAD", "B) hidden", "C) code", "D) draggable", "E) accesskey"],
+                correct: "A"
+            },
+            {
+                id: 116,
+                part: 3,
+                question: "Мәтінді форматтау үшін қандай тәсілдер қолданылады?",
+                options: ["A) тег мазмұнын өңдеуге рұқсат беретін атрибут", "B) drag-and-drop әрекеттерін анықтайтын атрибут", "C) құжат құрылымын беру және тікелей (физикалық) форматтау элементтерін қолдану", "D) HTML құжатының тақырып бөлігін анықтайтын тег", "E) барлық жауап дұрыс"],
+                correct: "C"
+            },
+            {
+                id: 117,
+                part: 3,
+                question: "Браузерлер мен іздеу жүйелеріне арналған ақпаратты сақтайтын метатегтерді анықтайды.",
+                options: ["A) BODY тегі", "B) CAPTION тегі", "C) META тегі", "D) FOOTER тегі", "E) THEAD тегі"],
+                correct: "C"
+            },
+            {
+                id: 118,
+                part: 3,
+                question: "Оның ішіндегі ақпарат әдетте қалың қаріппен көрсетіліп, ұяшықтың ортасына тураланады.",
+                options: ["A) em тегі", "B) TD тегі", "C) TH тегі", "D) strong тегі", "E) abbr тегі"],
+                correct: "C"
+            },
+            {
+                id: 119,
+                part: 3,
+                question: "< ! - - Текст - - > нені білдіреді?",
+                options: ["A) беттің автономды бөлігі", "B) құжат туралы ақпарат сақтайтын тег", "C) HTML стандарты қолданылғанын көрсететін тег", "D) комментарий тегтері", "E) дұрыс жауап жоқ"],
+                correct: "D"
+            },
+            {
+                id: 120,
+                part: 3,
+                question: "…………… элементі компьютерлік бағдарлама немесе скрипт нәтижесін көрсету үшін қолданылады.",
+                options: ["A) code тегі", "B) samp тегі", "C) dfn тегі", "D) abbr тегі", "E) strong тегі"],
+                correct: "B"
+            },
+            {
+                id: 121,
+                part: 3,
+                question: "____________ әдісі енгізу өрісі, хабарлама және OK мен Cancel батырмалары бар диалогтық терезені көрсетеді.",
+                options: ["A) prompt()", "B) splice()", "C) confirm()", "D) shift()", "E) alert()"],
+                correct: "A"
+            },
+            {
+                id: 122,
+                part: 3,
+                question: "____________ операторы айнымалының деректер типін сипаттайтын жолды қайтарады.",
+                options: ["A) unshift()", "B) typeof", "C) pop()", "D) some()", "E) push()"],
+                correct: "B"
+            },
+            {
+                id: 123,
+                part: 3,
+                question: "Мүмкін болған жағдайда жолды бүтін санға түрлендіретін функция.",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "A"
+            },
+            {
+                id: 124,
+                part: 3,
+                question: "Мүмкін болған жағдайда жолды қалқымалы үтірлі санға түрлендіретін функция.",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "B"
+            },
+            {
+                id: 125,
+                part: 3,
+                question: "Жолдағы өрнекті кәдімгі JavaScript өрнегі сияқты есептейтін функция.",
+                options: ["A) parseInt()", "B) parseFloat()", "C) eval()", "D) indexOf()", "E) join()"],
+                correct: "C"
+            },
+            {
+                id: 126,
+                part: 3,
+                question: "Массивтегі элементтер саны қандай қасиет арқылы анықталады?",
+                options: ["A) Boolean", "B) Object", "C) concat()", "D) length", "E) push()"],
+                correct: "D"
+            },
+            {
+                id: 127,
+                part: 3,
+                question: "else-блогы жоқ шартты оператордың түрі.",
+                options: ["A) шарт", "B) жеңілдетілген форма", "C) глобал айнымалы", "D) өрнек", "E) массив"],
+                correct: "B"
+            },
+            {
+                id: 128,
+                part: 3,
+                question: "Массивтен элемент іздеуге арналған, бірақ іздеу соңынан басталатын әдіс.",
+                options: ["A) reverse()", "B) lastIndexOf()", "C) push()", "D) forEach()", "E) indexOf()"],
+                correct: "B"
+            },
+            {
+                id: 129,
+                part: 3,
+                question: "Әрбір массив элементі үшін аргумент ретінде берілген функцияны шақыратын әдіс.",
+                options: ["A) concat()", "B) reverse()", "C) forEach()", "D) every()", "E) indexOf()"],
+                correct: "C"
+            },
+            {
+                id: 130,
+                part: 3,
+                question: "Бірнеше массивтерді біріктіру арқылы жаңа массив құратын әдіс.",
+                options: ["A) concat()", "B) reverse()", "C) reduce()", "D) push()", "E) sort()"],
+                correct: "A"
+            },
+            {
+                id: 131,
+                part: 3,
+                question: "Массивтің соңына элементтер қосуға арналған әдіс.",
+                options: ["A) splice()", "B) join()", "C) reduce()", "D) push()", "E) sort()"],
+                correct: "D"
+            },
+            {
+                id: 132,
+                part: 3,
+                question: "Массивтің басындағы элементті жоятын әдіс.",
+                options: ["A) unshift()", "B) shift()", "C) pop()", "D) push()", "E) sort()"],
+                correct: "B"
+            },
+            {
+                id: 133,
+                part: 3,
+                question: "Бинарлық ИЛИ (OR) операциясы — операндтардың біреуі true болса, ақиқат болады.",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "A"
+            },
+            {
+                id: 134,
+                part: 3,
+                question: "Унарлық терістеу (NOT) операциясы.",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "C"
+            },
+            {
+                id: 135,
+                part: 3,
+                question: "Массивтен элемент іздеуге арналған әдіс.",
+                options: ["A) reduce()", "B) lastIndexOf()", "C) join()", "D) concat()", "E) indexOf()"],
+                correct: "E"
+            },
+            {
+                id: 136,
+                part: 3,
+                question: "__________________ — айнымалылар, тұрақтылар және операторлар жиынтығы.",
+                options: ["A) reduce()", "B) өрнек", "C) жеңілдетілген форма", "D) unshift()", "E) шарт"],
+                correct: "B"
+            },
+            {
+                id: 137,
+                part: 3,
+                question: "Ағымдағы итерацияны тоқтатып, келесісіне өтеді.",
+                options: ["A) continue", "B) lastIndexOf()", "C) break", "D) parseInt", "E) indexOf()"],
+                correct: "A"
+            },
+            {
+                id: 138,
+                part: 3,
+                question: "______________________ — екі индекс, әрқайсысы бөлек квадрат жақшаларда беріледі.",
+                options: ["A) біржолды комментарий", "B) көпжолды комментарий", "C) екіөлшемді массив", "D) бірөлшемді массив", "E) шарт"],
+                correct: "C"
+            },
+            {
+                id: 139,
+                part: 3,
+                question: "Бинарлық ЖӘНЕ (AND) операциясы — екі операнд та ақиқат болғанда ғана ақиқат.",
+                options: ["A) ||", "B) &&", "C) !", "D) !=", "E) %"],
+                correct: "B"
+            },
+                        {
+                id: 140,
+                part: 3,
+                question: "Массивтің бір бөлігін жойып, оның орнына жаңа фрагмент енгізетін әдіс.",
+                options: ["A) join()", "B) reverse()", "C) splice()", "D) shift()", "E) unshift()"],
+                correct: "C"
+            },
+            {
+                id: 141,
+                part: 3,
+                question: " Массив негізінде бір мән есептеп шығаратын және элементтерді тізбектей өңдейтін әдіс.",
+                options: ["A) reduceRight()", "B) reverse()", "C) lastIndexOf() ", "D) splice() ", "E) reverse()"],
+                correct: "A"
+            },
+            {
+                id: 142,
+                part: 3,
+                question: "Әр элементке берілген функцияны қолданып, жаңа массив жасайтын әдіс.",
+                options: ["A) some()", "B) filter()", "C) map()", "D) splice()", "E) pop()"],
+                correct: "C"
+            },
+            {
+                id: 143,
+                part: 3,
+                question: "if шартты операторы не істейді?",
+                options: ["A) жолдағы өрнекті есептейді ", "B) шарттың ақиқат/жалған болуына қарай әртүрлі командаларды орындайды ", "C) функция ішінде жарияланған айнымалы", "D) if, switch", "E) массив элементіне мән беру"],
+                correct: "B"
+            },
+            {
+                id: 144,
+                part: 3,
+                question: "Салыстыру операторлары негізінде құрылған логикалық өрнек.",
+                options: ["A) alert() әдісі", "B) шарт", "C) айнымалы", "D) глобал айнымалы", "E) санауышы бар цикл"],
+                correct: "B"
+            },
+            {
+                id: 145,
+                part: 3,
+                question: "Массивті бір мәнге келтіру үшін қолданылатын әдіс.",
+                options: ["A) concat()", "B) reverse()", "C) reduce()", "D) slice()", "E) splice()"],
+                correct: "C"
+            },
+            {
+                id: 146,
+                part: 3,
+                question: "Кемінде бір элемент шартты қанағаттандырса true қайтаратын әдіс.",
+                options: ["A) some()", "B) sort()", "C) reduce()", "D) slice()", "E) forEach()"],
+                correct: "A"
+            },
+            {
+                id: 147,
+                part: 3,
+                question: "JavaScript-та айнымалыны қандай қызметтік сөзбен жариялауға болады?",
+                options: ["A) var, let", "B) int", "C) char", "D) Var", "E) $ int"],
+                correct: "A"
+            },
+            {
+                id: 148,
+                part: 3,
+                question: "Екі мән қабылдайтын (true/false) логикалық деректер типі.",
+                options: ["A) int", "B) char", "C) for", "D) float", "E) boolean"],
+                correct: "E"
+            },
+            {
+                id: 149,
+                part: 3,
+                question: "Массив элементтерін кері ретпен қайта сұрыптауға арналған әдіс.",
+                options: ["A) join()", "B) sort()", "C) reduce()", "D) reverse()", "E) reduceRight()"],
+                correct: "D"
+            },
+            {
+                id: 150,
+                part: 3,
+                question: "Массив элементтерінің мәндері негізінде мәтіндік жол құруға арналған әдіс.",
+                options: ["A) join()", "B) indexOf()", "C) reduce()", "D) lastIndexOf()", "E) push()"],
+                correct: "A"
+            }
+        ];
+
+        // Осы жерден кейін кодтың қалған бөлігі жалғасады
+        let currentQuestions = [];
+
+        function showPartSelection() {
+            document.getElementById('homePage').classList.replace('block', 'hidden');
+            document.getElementById('partSelectionPage').classList.replace('hidden', 'block');
+        }
+
+        function goBack() {
+            document.getElementById('homePage').className = 'block';
+            document.getElementById('partSelectionPage').className = 'hidden';
+            document.getElementById('testPage').className = 'hidden';
+            document.getElementById('resultPage').className = 'hidden';
+        }
+
+        function startTest(mode) {
+            document.getElementById('homePage').className = 'hidden';
+            document.getElementById('partSelectionPage').className = 'hidden';
+            document.getElementById('testPage').className = 'block';
+
+            if (mode === 'all') {
+                currentQuestions = [...testData];
+                document.getElementById('testTitle').innerText = "Барлық сұрақтар";
+            } else if (mode === 'random') {
+                currentQuestions = [...testData].sort(() => 0.5 - Math.random()).slice(0, 50);
+                document.getElementById('testTitle').innerText = "Кездейсоқ 50 сұрақ";
+            } else if (mode === 'part1') {
+                currentQuestions = testData.filter(q => q.id <= 40);
+                document.getElementById('testTitle').innerText = "1-бөлім";
+            } else if (mode === 'part2') {
+                currentQuestions = testData.filter(q => q.id > 40 && q.id <= 80);
+                document.getElementById('testTitle').innerText = "2-бөлім";
+            } else if (mode === 'part3') {
+                currentQuestions = testData.filter(q => q.id > 80);
+                document.getElementById('testTitle').innerText = "3-бөлім";
+            }
+
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            document.getElementById('questionCount').innerText = `1 - ${currentQuestions.length}`;
+            container.innerHTML = '';
+
+            currentQuestions.forEach((question, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.className = 'card';
+                questionBlock.innerHTML = `
+                    <p class="font-bold mb-4">${index + 1}. ${question.question}</p>
+                    <div class="space-y-2">
+                        ${question.options.map((option, optIndex) => {
+                            const letter = String.fromCharCode(65 + optIndex);
+                            return `
+                                <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                    <input type="radio" name="q${question.id}" value="${letter}" class="w-4 h-4 text-primary">
+                                    <span>${option}</span>
+                                </label>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                container.appendChild(questionBlock);
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function finishTest() {
+            let correctCount = 0;
+            let wrongAnswers = []; // Массив для хранения ошибок
+
+            currentQuestions.forEach(question => {
+                // Ищем выбранный пользователем вариант
+                const selected = document.querySelector(`input[name="q${question.id}"]:checked`);
+                const userChoice = selected ? selected.value : "Жауап берілмеді";
+
+                if (selected && selected.value === question.correct) {
+                    correctCount++;
+                } else {
+                    // Если ответ неверный, добавляем в список ошибок
+                    wrongAnswers.push({
+                        question: question.question,
+                        correctAnswer: question.correct,
+                        userAnswer: userChoice,
+                        options: question.options
+                    });
+                }
+            });
+
+            // Показываем страницу результатов
+            document.getElementById('testPage').className = 'hidden';
+            document.getElementById('resultPage').className = 'block';
+            
+            // Заполняем цифры
+            document.getElementById('totalQuestions').innerText = currentQuestions.length;
+            document.getElementById('correctAnswers').innerText = correctCount;
+            document.getElementById('resultPercent').innerText = Math.round((correctCount / currentQuestions.length) * 100) + '%';
+
+            // Выводим список ошибок
+            const listContainer = document.getElementById('wrongAnswersList');
+            const block = document.getElementById('wrongAnswersBlock');
+            
+            listContainer.innerHTML = ''; // Очищаем старое
+
+            if (wrongAnswers.length > 0) {
+                block.classList.remove('hidden'); // Показываем блок, если есть ошибки
+                wrongAnswers.forEach((item, index) => {
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'p-4 border-l-4 border-danger bg-red-50 rounded-r-lg';
+                    
+                    // Находим полный текст правильного ответа из массива options
+                    const correctText = item.options.find(opt => opt.startsWith(item.correctAnswer)) || item.correctAnswer;
+                    
+                    errorItem.innerHTML = `
+                        <p class="font-bold text-sm mb-1">${index + 1}. ${item.question}</p>
+                        <p class="text-xs text-red-600">Сіздің жауабыңыз: ${item.userAnswer}</p>
+                        <p class="text-xs text-green-600 font-semibold">Дұрыс жауап: ${correctText}</p>
+                    `;
+                    listContainer.appendChild(errorItem);
+                });
+            } else {
+                block.classList.add('hidden'); // Прячем, если ошибок нет (идеальный результат!)
+            }
+            window.scrollTo(0, 0); // Прокручиваем вверх, чтобы увидеть результат
+        }
+    </script>
+</body>
+</html>
